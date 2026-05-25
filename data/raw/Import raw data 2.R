@@ -155,3 +155,45 @@ df_gdp_clean %>%
 #All present
 
 # Government expenditure on culture
+df_culture <- get_eurostat("gov_10a_exp", time_format = "num")
+
+#Inspect the dataset
+names(df_culture)
+df_culture %>%  distinct(cofog99) #Classification of Functions of Government: divide public spending by sector, we need GF08 = recreation, culture and religion 
+df_culture %>%  distinct(unit) # measurement unit, we need PC_GDP= PIL percentage
+df_culture %>%  distinct(na_item) # National Accounts item: type of  public spending, we need TE = Total Expenditure
+
+#Clean and filter what is useful
+df_culture_clean <- df_culture %>% 
+  filter(
+    cofog99     == "GF08",      # Recreation, culture and religion
+    unit        == "PC_GDP",    #PIL percentage, to make cross-national comparisons
+    na_item     == "TE",        # Total Expenditure
+    sector      == "S13",       # General government: it inclued all levels of government (central, regional, local)
+    TIME_PERIOD %in% c(2006, 2015, 2022)
+  ) %>% 
+  select(geo, TIME_PERIOD, values) |>
+  rename(
+    country      = geo,
+    year         = TIME_PERIOD,
+    culture_exp  = values
+  )
+
+# #Check if all the 26 countries of the df_youth are also in df_culture_clean
+df_culture_clean %>% 
+  filter(country %in% df_youth$country) %>% 
+  group_by(year) %>% 
+  summarise(
+    n_countries = n(),
+    n_missing   = sum(is.na(culture_exp))
+  )
+# We see that in 2026 one country is missing, find which one
+countries_2006 <- df_culture_clean %>% 
+  filter(year == 2006) %>% 
+  pull(country)
+
+df_youth %>% 
+  distinct(country) %>% 
+  filter(!country %in% countries_2006)
+
+#Slovakia
