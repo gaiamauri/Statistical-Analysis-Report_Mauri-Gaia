@@ -48,3 +48,8 @@ po/*~
 # RStudio Connect folder
 rsconnect/
 .positai
+
+# Raw data files - too large for GitHub
+data/raw/ZA4529_v3-0-1.sav
+ZA5688_v6-0-0.sav
+data/processed/*.csv
