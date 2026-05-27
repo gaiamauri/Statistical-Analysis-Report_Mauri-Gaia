@@ -1,18 +1,26 @@
 # 01-data-import.R----
 # Download raw datasets from Eurostat and save to data/raw/
 # install.packages("eurostat")
+# install.packages("haven")
 library(eurostat)
 library(tidyverse)
+library(haven)
 
-# Dataset Dependent Variable: cultural and sport participation ----
-df_scp01 <- get_eurostat("ilc_scp01", time_format = "num")
+# Dataset Dependent Variable: Eurobarometer----
+
+#Special Eurobarometer 278: European cultural values
+
+df_2007 <- read_sav("data/raw/ZA4529_v3-0-1.sav")
+
+#Special Eurobarometer 399: Cultural access and participation
+
+df_2013 <- read_sav("data/raw/ZA5688_v6-0-0.sav")
 
 # Independent Variables Datasets ----
-# Independent variable 1: Internet use----
-df_internet <- get_eurostat("isoc_ci_ifp_iu", time_format = "num")
-# Independent variable 2: GDP per capita----
+
+# Independent variable 1: GDP per capita----
 df_gdp <- get_eurostat("nama_10_pc", time_format = "num")
-# Independent variable 3: Government expenditure on culture----
+# Independent variable 2: Government expenditure on culture----
 df_culture <- get_eurostat("gov_10a_exp", time_format = "num")
 # It is too heavy so i filter and reload it
 #Inspect the dataset
@@ -38,9 +46,8 @@ df_culture_clean <- df_culture %>%
   )
 
 # Save raw data to data/raw/
-write_csv(df_scp01,    "data/raw/scp01_raw.csv")
-write_csv(df_internet, "data/raw/internet_raw.csv")
 write_csv(df_gdp,      "data/raw/gdp_raw.csv")
 write_csv(df_culture_clean,  "data/raw/culture_raw.csv")
 
 message("Raw data downloaded and saved to data/raw/")
+
