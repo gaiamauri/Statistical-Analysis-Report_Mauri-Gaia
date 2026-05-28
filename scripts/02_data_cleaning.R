@@ -1,204 +1,234 @@
 # 02-data-cleaning.R----
+
 # Clean, filter and merge all datasets into main_dataset.csv ----
 
 library(tidyverse)
+library(haven)
 
-# Load raw data from data/raw/
-df_scp01    <- read_csv("data/raw/scp01_raw.csv")
-df_internet <- read_csv("data/raw/internet_raw.csv")
-df_gdp      <- read_csv("data/raw/gdp_raw.csv")
-df_culture  <- read_csv("data/raw/culture_raw.csv")
+# Eurobarometer microdata (downloaded manually from GESIS)
+df_2007 <- read_sav("data/raw/ZA4529_v3-0-1.sav")
+df_2013 <- read_sav("data/raw/ZA5688_v6-0-0.sav")
 
-#DEPENDENT VARIABLE: youth cultural and sport participation----
-#Inspect the dataset
-df_scp01 %>% distinct(age)   # I need the name for age 16_29
-df_scp01 %>% distinct(sex)   
-df_scp01 %>% distinct(isced11) # Education level
-df_scp01 %>% distinct(TIME_PERIOD)  # Years
+# Country-level variables (downloaded from Eurostat in 01-data-import.R)
+df_gdp_clean     <- read_csv("data/raw/gdp_raw.csv")
+df_culture_clean <- read_csv("data/raw/culture_raw.csv")
 
-df_youth <- df_scp01 %>% 
-  as_tibble() %>% 
-  select(
-    age, sex,isced11, TIME_PERIOD, geo, values, frequenc)
+#DEPENDENT VARIABLE: Index of cultural participation - number of cultural activities attended at least once in the last 12 months----
 
-df_youth <- df_youth %>%
-  filter(
-    age         == "Y16-29",
-    sex         == "T",   
-    isced11     == "TOTAL", #not filter for education level
-    frequenc== "GE1", #filter just who participated at least once in the last 12 months
-    TIME_PERIOD %in% c(2006, 2015, 2022)
+# Inspect Eurobarometer datasets ----
+nrow(df_2007)
+nrow(df_2013)
+names(df_2007)
+names(df_2013)
+
+# Comparison df_2013 and df_2007 to check if are comparable
+# Check the variables: one cultural activity (cinema), internet use, age, country
+# The correspondences between categories and what they represent are possible thanks to the codebooks, available at the datasets' Gesis webpage
+
+# Key variables of df_2013:
+df_2013 %>% count(qb1_1) #cinema
+df_2013 %>% count(qc2) # internet use frequency
+df_2013 %>% count(isocntry) #country
+df_2013 %>% count(d11) #age
+df_2013 %>% count(d8) #education: it is a measure of the age at which the respondent finished school not the level of education directly 
+df_2013 %>% count(d15a) #employment
+df_2013 %>% count(d10) #gender
+
+# Key Variables of df_2007
+df_2007 %>% count(v95)    # cinema
+df_2007 %>% count(v115)   # internet use frequency
+df_2007 %>% count(v727) %>% print(n = 20) # country
+df_2007 %>% count (v7) #age
+df_2007 %>% count (v724) #education
+
+# Clean df_2007 ----
+# Rename categories using the GESIS codebook
+df_2007_clean <- df_2007 %>%
+  rename(
+    country      = v7,     # country ISO code
+    age          = v727,   # D11 age
+    sex          = v726,   # D10 gender (1=male, 2=female)
+    education    = v724,   # D8 age when stopped full-time education
+    occupation   = v730,   # D15A occupation
+    internet_use = v115,   # QA6 internet use frequency (1=every day, 6=never)
+    cult_ballet  = v94,    # QA4_1 ballet/dance/opera
+    cult_cinema  = v95,    # QA4_2 cinema
+    cult_theatre = v96,    # QA4_3 theatre
+    cult_concert = v98,    # QA4_5 concert
+    cult_library = v99,    # QA4_6 public library
+    cult_monuments = v100, # QA4_7 historical monuments
+    cult_museum  = v101    # QA4_8 museums/galleries
+) %>%
+  # Filter youth 15-29
+  filter(age >= 15 & age <= 29) %>%
+  # Add year identifier
+  mutate(year = 2007) %>%
+  # Keep only relevant columns
+  select(country, year, age, sex, education, occupation,
+         internet_use, cult_ballet, cult_cinema, cult_theatre,
+         cult_concert, cult_library, cult_monuments, cult_museum)
+
+nrow(df_2007_clean)
+
+# Clean df_2013 ----
+# Rename categories using the GESIS codebook
+df_2013_clean <- df_2013 %>%
+# Remove numeric country column to avoid conflict with "isocntry" rename
+  select(-country) %>%
+  rename(
+    country      = isocntry, # country ISO code
+    age          = d11,      # D11 age exact
+    sex          = d10,      # D10 gender (1=male, 2=female)
+    education    = d8,       # D8 age when stopped full-time education
+    occupation   = d15a,     # D15A occupation
+    internet_use = qc2,      # QC2 frequency of internet use for cultural purposes
+    cult_ballet  = qb1_1,    # QB1_1 ballet/opera
+    cult_cinema  = qb1_2,    # QB1_2 cinema
+    cult_theatre = qb1_3,    # QB1_3 theatre
+    cult_concert = qb1_4,    # QB1_4 concert
+    cult_library = qb1_5,    # QB1_5 public library
+    cult_monuments = qb1_6,  # QB1_6 historical monuments
+    cult_museum  = qb1_7     # QB1_7 museums/galleries
   ) %>%
-  select(geo, TIME_PERIOD, values) %>%
-  rename(
-    country    = geo,
-    year       = TIME_PERIOD ,
-    part_rate       = values)
+  # Filter youth 15-29
+  filter(age >= 15 & age <= 29) %>%
+  # Add year identifier
+  mutate(year = 2013) %>%
+  # Keep only relevant columns
+  select(country, year, age, sex, education, occupation,
+         internet_use, cult_ballet, cult_cinema, cult_theatre,
+         cult_concert, cult_library, cult_monuments, cult_museum)
 
-#Inspect the cleaned dataset
-str(df_youth)
-nrow(df_youth)
+nrow(df_2013_clean)
 
-# Number of countries
-df_youth %>%  distinct(country)
+#Pool the two waves ----
+# Remove SPSS value labels before binding (converts to plain numeric)
+# Exclude country column (character) from numeric conversion
+df_2007_clean <- df_2007_clean %>%
+  mutate(across(-country, as.numeric))
 
-# Number of waves for each country
-df_youth %>% 
-  group_by(country) %>% 
-  summarise(n_waves = n()) %>% 
-  print(n = 37)
+df_2013_clean <- df_2013_clean %>%
+  mutate(across(-country, as.numeric))
 
-# I decided to proceed excluding countries with less than 3 waves
-# In the dataset there are also some non EU-countries: if they have 3 waves they remain in the dataset (just Norway)
+# Merge df_2007_clean and df_2013_clean, vertically (same columns, different respondents)
+df_pooled <- bind_rows(df_2007_clean, df_2013_clean)
 
-df_youth <- df_youth %>% 
-  group_by(country) %>% 
-  filter(n() == 3) %>% 
-  ungroup()
+nrow(df_pooled)
 
-nrow(df_youth)
-df_youth %>%  distinct(country) %>% print(n = 26)
+# Recode variables----
 
-#Dependent Variable Inspection----
-# Descriptive statistics
-summary(df_youth$part_rate)
-
-# Annual Distribution
-df_youth %>% 
-  group_by(year) %>% 
-  summarise(
-    mean_part = mean(part_rate, na.rm = TRUE),
-    sd_part   = sd(part_rate, na.rm = TRUE),
-    min_part  = min(part_rate, na.rm = TRUE),
-    max_part  = max(part_rate, na.rm = TRUE)
+df_pooled <- df_pooled %>%
+  mutate(
+    # Dependent variable: participation index (0-7)
+    # Recode each activity: 1 = participated (any frequency), 0 = never
+    # Original scale: 1=never, 2=1-2 times, 3=3-5 times, 4=more than 5 times
+    cult_ballet_bin    = if_else(cult_ballet > 1,    1L, 0L, missing = NA_integer_),
+    cult_cinema_bin    = if_else(cult_cinema > 1,    1L, 0L, missing = NA_integer_),
+    cult_theatre_bin   = if_else(cult_theatre > 1,   1L, 0L, missing = NA_integer_),
+    cult_concert_bin   = if_else(cult_concert > 1,   1L, 0L, missing = NA_integer_),
+    cult_library_bin   = if_else(cult_library > 1,   1L, 0L, missing = NA_integer_),
+    cult_monuments_bin = if_else(cult_monuments > 1, 1L, 0L, missing = NA_integer_),
+    cult_museum_bin    = if_else(cult_museum > 1,    1L, 0L, missing = NA_integer_),
+    
+    # Participation index: sum of 7 binary activities (range 0-7)
+    part_index = cult_ballet_bin + cult_cinema_bin + cult_theatre_bin +
+      cult_concert_bin + cult_library_bin +
+      cult_monuments_bin + cult_museum_bin,
+    
+    # Binary DV: participated in at least one activity
+    part_any = if_else(part_index > 0, 1L, 0L, missing = NA_integer_),
+    
+    # Internet use: reverse scale so higher = more use
+    # Original: 1=every day, 6=never → reverse: 1=never, 6=every day
+    internet_use_rev = 7 - internet_use,
+    
+    # Education: recode age of end of studies into 3 categories
+    # Low:    stopped at 15 or younger
+    # Medium: stopped 16-19
+    # High:   stopped at 20 or older (still studying = 0, treat as high)
+    education_cat = case_when(
+      education == 0              ~ "high",   # still studying
+      education <= 15             ~ "low",
+      education >= 16 & education <= 19 ~ "medium",
+      education >= 20             ~ "high",
+      TRUE                        ~ NA_character_
+    ),
+    
+    # Sex: recode to binary (0=male, 1=female)
+    female = if_else(sex == 2, 1L, 0L),
+    
+    # Year dummy
+    year_2013 = if_else(year == 2013, 1L, 0L)
   )
 
-# Independent Variables Datasets ----
+# Standardise country codes---- 
+# Germany is split into DE-E and DE-W in both waves
+# Merge into single DE code
+df_pooled <- df_pooled %>%
+  mutate(country = if_else(country %in% c("DE-E", "DE-W"), "DE", country))
 
-# Independent Variable 1: Internet Use----
+# UK is split into GB-GBN (Great Britain) e GB-NIR (Nothern Irland) in both waves
+# Merge into single GB code
+df_pooled <- df_pooled %>%
+mutate(country = if_else(country %in% c("GB-GBN", "GB-NIR"), "GB", country))
 
-#Inspect the dataset
-str(df_internet)
-head(df_internet)
-names(df_internet)
+# Standardise country codes to match Eurostat
+df_pooled <- df_pooled %>%
+  mutate(country = case_when(
+    country == "GR" ~ "EL",  # Greece: Eurobarometer uses GR, Eurostat uses EL
+    country == "GB" ~ "UK",  # UK: Eurobarometer uses GB, Eurostat uses UK
+    TRUE ~ country            # all other countries unchanged
+  ))
+# Check countries: should be 28
+df_pooled %>% distinct(country) %>% print(n = 30)
 
-#Clean and filter what is useful
-df_internet_clean <- df_internet %>% 
-  filter(
-    indic_is    == "I_ILT12", #Last internet use: in the last 12 months. % individuals who used internet in the last 12 months
-    ind_type    == "IND_TOTAL", #Not filtered for age
-    unit        == "PC_IND", #Percentage of individuals
-    TIME_PERIOD %in% c(2006, 2015, 2022)
-  ) %>% 
-  select(geo, TIME_PERIOD, values) %>% 
-  rename(
-    country      = geo,
-    year         = TIME_PERIOD,
-    internet_use = values
-  )
+#Merge country-level variables----
 
-#Check the result
-nrow(df_internet_clean)
-
-df_internet_clean %>% 
-  group_by(year) %>% 
-  summarise(n_countries = n())
-
-#Check if all the 26 countries of the df_youth are also in df_internet_clean
-
-df_internet_clean %>% 
-  filter(country %in% df_youth$country) %>% 
-  group_by(year) %>% 
-  summarise(
-    n_countries = n(),
-    n_missing   = sum(is.na(internet_use))
-  )
-#All present
-
-# Independent Variable 2: GDP per capita----
-
-#Inspect the dataset
-names(df_gdp)
-df_gdp %>%  distinct(na_item)
-df_gdp %>%  distinct(unit)
-
-#Clean and filter what is useful
-df_gdp_clean <- df_gdp %>% 
-  filter( 
-    na_item     == "B1GQ", #the code for GDP
-    unit        == "CP_PPS_EU27_2020_HAB", #GDP per capita in Purchasing Power Parity (PPS), referred to EU 27 2020
-    TIME_PERIOD %in% c(2006, 2015, 2022)
-  ) %>% 
-  select(geo, TIME_PERIOD, values) %>% 
-  rename(
-    country = geo,
-    year    = TIME_PERIOD,
-    gdp_pc  = values
-  )
-
-#Check the result
-nrow(df_gdp_clean)
-
-df_gdp_clean %>% 
-  group_by(year) %>% 
-  summarise(n_countries = n())
-
-#Check if all the 26 countries of the df_youth are also in df_gdp_clean
-
-df_gdp_clean %>% 
-  filter(country %in% df_youth$country) %>% 
-  group_by(year) %>% 
-  summarise(
-    n_countries = n(),
-    n_missing   = sum(is.na(gdp_pc))
-  )
-#All present
-
-# Independent Variable 3: Government expenditure on culture----
-# Already cleaned
-
-# #Check if all the 26 countries of the df_youth are also in df_culture_clean
-df_culture_clean %>% 
-  filter(country %in% df_youth$country) %>% 
-  group_by(year) %>% 
-  summarise(
-    n_countries = n(),
-    n_missing   = sum(is.na(culture_exp))
-  )
-# We see that in 2026 one country is missing, find which one
-countries_2006 <- df_culture_clean %>% 
-  filter(year == 2006) %>% 
-  pull(country)
-
-df_youth %>% 
-  distinct(country) %>% 
-  filter(!country %in% countries_2006)
-
-#Slovakia
-
-# Merge the datasets ----
-# Merge df_youth with df_internet_clean
-df_merged <- df_youth %>% 
-  left_join(df_internet_clean, by = c("country", "year"))
-
-# Add df_gdp_clean
-df_merged <- df_merged %>% 
-  left_join(df_gdp_clean, by = c("country", "year"))
-
-# Add df_culture_clean
-df_merged <- df_merged %>% 
+df_final <- df_pooled %>%
+  left_join(df_gdp_clean,     by = c("country", "year")) %>%
   left_join(df_culture_clean, by = c("country", "year"))
 
-#Check
-glimpse(df_merged)
-nrow(df_merged)
-#If there are NA's
-df_merged %>% 
+#Final check
+
+glimpse(df_final)
+nrow(df_final)
+
+# NA count per variable
+df_final %>%
   summarise(across(everything(), ~ sum(is.na(.))))
-# 1 NA in "part_rate": Germany 2022 and 1 NA in "culture_exp": Slovakia 2006
 
-# SAVE processed dataset ----
-write_csv(df_merged, "data/processed/main_dataset.csv")
+df_final %>%
+  summarise(
+    na_gdp     = sum(is.na(gdp_pc)),
+    na_culture = sum(is.na(culture_exp))
+  )
+# UK is excluded from the analysis because culture_exp data are not available
+# for either wave (2007 and 2013) in Eurostat gov_10a_exp dataset
+# Slovakia (SK) is missing culture_exp only for 2007: 187 na_culture — kept in the analysis
+df_final <- df_final %>%
+  filter(country != "UK")
 
+# Verify
+nrow(df_final)
+df_final %>% distinct(country) %>% print(n = 30)
+
+df_final %>%
+  summarise(
+    na_gdp     = sum(is.na(gdp_pc)),
+    na_culture = sum(is.na(culture_exp))
+  )
+
+# Descriptive statistics of key variables
+df_final %>%
+  group_by(year) %>%
+  summarise(
+    n             = n(),
+    mean_part     = mean(part_index,    na.rm = TRUE),
+    mean_internet = mean(internet_use_rev, na.rm = TRUE),
+    mean_gdp      = mean(gdp_pc,        na.rm = TRUE)
+  )
+# Save processed data: final dataset
+
+write_csv(df_final, "data/processed/main_dataset.csv")
 message("Cleaned dataset saved to data/processed/main_dataset.csv")
 
