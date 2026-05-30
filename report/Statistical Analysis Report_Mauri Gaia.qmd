@@ -5,4 +5,24 @@ format: pdf
 editor: visual
 ---
 
-## 
+# Individual and country-level determinants of youth cultural participation in Europe: a Multilevel Analysis using Eurobarometer data (2007 and 2013)
+
+Cultural participation is a right enshrined in the United Nations Declaration of Human Rights, a key element for the quality of individual and collective life, able to generate positive effects on individual opportunities, quality of life and wellness as a whole.
+
+It should be explored in a multidimensional way, taking into account a broad spectrum of cultural activities and describing how both individual characteristics and social and contextual features affect it.
+
+The European Union has played an increasing role in cultural policy and European cultural cooperation with the development of an Agenda for Culture by the European Commission in 2007, endorsed by the Council of the European Union and the European Council. 
+
+For the purpose of this analysis data come from the Special Eurobarometer 278 “European cultural values”and the Special Eurobarometer 399 “Cultural Access and Participation”, two surveys conducted by the European Commission in 2007 and 2013 in which European citizens were interviewed face-to-face in their homes across all 27 EU countries plus Croatia. Each person answers questions about their cultural participation.
+
+The research aims to understand to what extent do individual-level factors (internet use for cultural purposes, education, socioeconomic status) and country-level factors (GDP per capita, government expenditure on culture) explain participation in cultural activities among young Europeans (15–29 years old) and how did this relationship changed between 2007 and 2013.
+
+The main hypotheses are the following:
+
+1.  Individual internet use for cultural purposes is associated with physical cultural participation among young Europeans, net of educational attainment and employment status. The direction of the effect (positive = complement; negative = substitute) is determined empirically;
+
+2.  The association between internet use and cultural participation changed between 2007 and 2013, when social media and digital platforms developed.
+
+3.  Young people living in countries with higher GDP per capita show higher cultural participation rates, independently of individual-level socioeconomic characteristics;
+
+4.  Young people living in countries with higher government expenditure on culture show higher participation rates independently of national wealth, suggesting that institutional investment matters over and above individual purchasing power.
