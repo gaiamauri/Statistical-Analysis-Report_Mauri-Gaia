@@ -37,9 +37,10 @@ df_2013 %>% count(d10) #gender
 # Key Variables of df_2007
 df_2007 %>% count(v95)    # cinema
 df_2007 %>% count(v115)   # internet use frequency
-df_2007 %>% count(v727) %>% print(n = 20) # country
-df_2007 %>% count (v7) #age
+df_2007 %>% count(v7) %>% print(n = 20) # country
+df_2007 %>% count (v727) #age
 df_2007 %>% count (v724) #education
+
 
 # Clean df_2007 ----
 # Rename categories using the GESIS codebook
@@ -60,6 +61,7 @@ df_2007_clean <- df_2007 %>%
     cult_museum  = v101    # QA4_8 museums/galleries
 ) %>%
   # Filter youth 15-29
+  mutate(age = as.numeric(age)) %>%
   filter(age >= 15 & age <= 29) %>%
   # Add year identifier
   mutate(year = 2007) %>%
