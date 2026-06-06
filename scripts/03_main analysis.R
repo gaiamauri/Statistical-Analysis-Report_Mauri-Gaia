@@ -114,4 +114,75 @@ tab_model(model0, model1, model2,
           title = "Multilevel Models of Youth Cultural Participation (2007-2013)",
           file       = "tables/regression_table.html")
 
+# PREDICTION PLOT: Interaction internet_use × year_2013 ----
+# Following the approach shown in class (session 12)
 
+plot_model(
+  model2,
+  type  = "int",
+  terms = c("internet_use_z", "year_2013")
+) +
+  theme_minimal() +
+  labs(
+    title    = "Predicted Cultural Participation by Internet Use and Wave",
+    subtitle = "Marginal predictions at mean values of other covariates",
+    x        = "Internet Use (standardised)",
+    y        = "Predicted Participation Index (0–7)",
+    color    = "Wave",
+    fill     = "Wave"
+  ) +
+  scale_color_manual(
+    values = c("0" = "#1A3557", "1" = "#2E6DAD"),
+    labels = c("0" = "2007",    "1" = "2013")
+  )
+
+# Save
+ggsave("figures/fig1_interaction_plot.png",
+       width = 7, height = 5, dpi = 300)
+
+# MARGINAL EFFECTS ----
+
+library(marginaleffects)
+
+# Average Marginal Effect (AME) of internet use
+# Single summary number: on average, how much does 
+# a 1 SD increase in internet use change participation?
+marginaleffects::avg_slopes(model2, variables = "internet_use_z")
+
+# Marginal Effects at specific values of the moderator (year)
+# How does the effect of internet use differ in 2007 vs 2013?
+marginaleffects::avg_slopes(
+  model2,
+  variables = "internet_use_z",
+  by        = "year_2013",
+  newdata   = datagrid(year_2013 = c(0, 1))
+)
+
+# Save AME results
+ame_results <- marginaleffects::avg_slopes(
+  model2,
+  variables = "internet_use_z",
+  by        = "year_2013",
+  newdata   = datagrid(year_2013 = c(0, 1))
+)
+
+# Plot AMEs
+plot_slopes(
+  model2,
+  variables = "internet_use_z",
+  condition = "year_2013"
+) +
+  theme_minimal() +
+  scale_x_discrete(
+    breaks = c(0, 1),
+    labels = c("2007", "2013")
+  ) +
+  labs(
+    title    = "Marginal Effect of Internet Use on Cultural Participation",
+    subtitle = "Average Marginal Effects by wave (2007 vs 2013)",
+    x        = "Wave",
+    y        = "AME of Internet Use"
+  )
+
+ggsave("figures/fig2_ame_plot.png",
+       width = 6, height = 4, dpi = 300)
