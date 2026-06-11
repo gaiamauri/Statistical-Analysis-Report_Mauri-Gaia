@@ -3,11 +3,23 @@ library(lme4)
 library(modelsummary) 
 library(sjPlot)
 
-# Multilevel models: cultural participation ~ internet use ----
-
 #Load data
 df_final <- read_csv("data/processed/main_dataset.csv",
-                    show_col_types = FALSE)
+                     show_col_types = FALSE)
+
+#Inspection and Distribution of the Dependent Variable: participation index ----
+summary(df_final$part_index)
+table(df_final$part_index)
+
+# Histogram
+ggplot(df_final, aes(x = part_index)) +
+  geom_histogram(bins = 8, fill = "steelblue", color = "white") +
+  theme_minimal() +
+  labs(title = "Distribution of Cultural Participation Index",
+       x = "Number of activities (0-7)", y = "Count")
+
+# Multilevel models: cultural participation ~ internet use ----
+
 
 # Prepare variables ----
 #Create year_country variable because gdp_pc and culture_exp change in the country between 2007 and 2013
@@ -100,14 +112,27 @@ model2 <- lmer(
 
 sjPlot:: tab_model(model2)
 
+# Model 3: random slopes for internet use ----
+model3 <- lmer(
+  part_index ~ internet_use_z * year_2013 + education_cat +
+    female + age_z + gdp_pc_z + culture_exp_z +
+    (1 + internet_use_z | country_year),
+  data = df_final,
+  REML = TRUE
+)
+
+sjPlot:: tab_model(model3)
+
+
 # Save Models
 saveRDS(model0, "tables/model0.rds")
 saveRDS(model1, "tables/model1.rds")
 saveRDS(model2, "tables/model2.rds")
+saveRDS(model3, "tables/model3.rds")
 
 # Final Table with the 3 models
-tab_model(model0, model1, model2,
-          dv.labels = c("Null model", "Model 1", "Model 2"),
+tab_model(model0, model1, model2,model3,
+          dv.labels = c("Null model", "Model 1", "Model 2", "Model 3 (Random Slopes)"),
           show.icc   = TRUE,
           show.re.var = TRUE,
           p.style    = "stars",
