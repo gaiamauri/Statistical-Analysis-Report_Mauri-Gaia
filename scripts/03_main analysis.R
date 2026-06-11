@@ -112,7 +112,7 @@ model2 <- lmer(
 
 sjPlot:: tab_model(model2)
 
-# Model 3: random slopes for internet use ----
+# MODEL 3: random slopes for internet use ----
 model3 <- lmer(
   part_index ~ internet_use_z * year_2013 + education_cat +
     female + age_z + gdp_pc_z + culture_exp_z +
@@ -211,3 +211,50 @@ plot_slopes(
 
 ggsave("figures/fig2_ame_plot.png",
        width = 6, height = 4, dpi = 300)
+
+# RANDOM SLOPES PLOT ----
+# Shows variation in the effect of internet use across country-years
+sjPlot::plot_model(model3,
+                   type     = "re",
+                   sort.est = "internet_use_z") +
+  theme_minimal() +
+  labs(
+    title    = "Random Slopes for Internet Use by Country-Year",
+    subtitle = "Variation in the effect of internet use across European contexts"
+  )
+
+ggsave("figures/fig4_random_slopes.png",
+       width = 7, height = 8, dpi = 300)
+
+# Disaggregated participation index by activity and year -----
+df_final %>%
+  group_by(year) %>%
+  summarise(
+    Cinema     = mean(cult_cinema_bin,    na.rm = TRUE),
+    Theatre    = mean(cult_theatre_bin,   na.rm = TRUE),
+    Concert    = mean(cult_concert_bin,   na.rm = TRUE),
+    Museum     = mean(cult_museum_bin,    na.rm = TRUE),
+    Monuments  = mean(cult_monuments_bin, na.rm = TRUE),
+    Library    = mean(cult_library_bin,   na.rm = TRUE),
+    Ballet     = mean(cult_ballet_bin,    na.rm = TRUE)
+  ) %>%
+  pivot_longer(-year, names_to = "activity", values_to = "participation_rate") %>%
+  ggplot(aes(x = reorder(activity, participation_rate),
+             y = participation_rate,
+             fill = factor(year))) +
+  geom_col(position = "dodge") +
+  coord_flip() +
+  scale_fill_manual(values = c("2007" = "red", "2013" = "#2E6DAD"),
+                    labels = c("2007", "2013")) +
+  scale_y_continuous(labels = scales::percent) +
+  theme_minimal() +
+  labs(
+    title    = "Participation Rate by Cultural Activity and Wave",
+    subtitle = "Share of young Europeans (15-29) participating at least once in last 12 months",
+    x        = NULL,
+    y        = "Share participating (%)",
+    fill     = "Wave"
+  )
+
+ggsave("figures/fig5_activities_disaggregated.png",
+       width = 7, height = 5, dpi = 300)
