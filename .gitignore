@@ -53,3 +53,16 @@ rsconnect/
 data/raw/ZA4529_v3-0-1.sav
 ZA5688_v6-0-0.sav
 data/processed/*.csv
+
+# Temporary R files
+.RDataTmp1
+.RDataTmp2
+
+
+# R workspace
+.RData
+.Rhistory
+
+# RStudio temporary folders
+E70A65EB/
+shared/
