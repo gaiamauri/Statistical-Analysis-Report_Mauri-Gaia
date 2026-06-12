@@ -65,8 +65,6 @@ df_final <- df_final %>%
  culture_exp_z= (culture_exp - macro_stats$mean_cult) / macro_stats$sd_cult
   )
 
-
-
 # check
 summary(df_final$internet_use_z)  # mean ≈ 0, sd ≈ 1
 summary(df_final$gdp_pc_z)

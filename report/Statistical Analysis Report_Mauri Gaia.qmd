@@ -125,3 +125,62 @@ All continuous predictors are standardised (z-scores), country-level variables a
 The nested structure of the data, individuals within country-years, requires a multilevel model, with random intercepts by country-year. The model allows baseline participation rates to vary across European contexts while estimating fixed effects for both individual- and country-level predictors.
 
 Given the distributional properties of the outcome described in the previous pharagraph, a linear multilevel model is preferred over a multilevel Poisson or negative binomial model.
+
+Four models are estimated sequentially:
+
+**Model 0** is a null model with random intercepts only and no predictors, used to compute the Intraclass Correlation Coefficient (ICC) and assess the degree of country-year clustering.
+
+$$part\_index_{ij} = \beta_0 + u_j + e_{ij}$$ {#eq-model0}
+
+**Model 1** is the multilevel base model, it introduces all fixed-effect predictors — internet use, education, sex, age, year dummy, GDP per capita and government expenditure on culture — with a random intercept by country-year. This model tests Hypotheses 1, 3, and 4.
+
+$$\begin{aligned}
+part\_index_{ij} = \, & \beta_0 + \beta_1(internet\_use_{ij}) + \beta_2(year_{ij}) + \\
+& \beta_3(education_{ij}) + \beta_4(female_{ij}) + \beta_5(age_{ij}) + \\
+& \gamma_1(GDP_j) + \gamma_2(Culture\_Exp_j) + u_j + e_{ij}
+\end{aligned}$$ {#eq-model1}
+
+**Model 2** extends Model 1 by adding an interaction term between internet use and the year dummy (internet_use_z \* year_2013), directly testing Hypothesis 2, whether the association between internet use and physical cultural participation changed between 2007 and 2013.
+
+$$\begin{aligned}
+part\_index_{ij} = \, & \beta_0 + \beta_1(internet\_use_{ij}) + \beta_2(year_{ij}) + \\
+& \beta_3(internet\_use_{ij} \times year_{ij}) + \beta_4(education_{ij}) + \\
+& \beta_5(female_{ij}) + \beta_6(age_{ij}) + \\
+& \gamma_1(GDP_j) + \gamma_2(Culture\_Exp_j) + u_j + e_{ij}
+\end{aligned}$$ {#eq-model2}
+
+**Model 3** further extends Model 2 by allowing the slope of internet use to vary across country-years (random slope specification), testing whether the internet effect is homogeneous across European societies.
+
+$$\begin{aligned}
+part\_index_{ij} = \, & \beta_0 + \beta_1(internet\_use_{ij}) + \beta_2(year_{ij}) + \\
+& \beta_3(internet\_use_{ij} \times year_{ij}) + \beta_4(education_{ij}) + \\
+& \beta_5(female_{ij}) + \beta_6(age_{ij}) + \\
+& \gamma_1(GDP_j) + \gamma_2(Culture\_Exp_j) + \\
+& u_j + u_{1j}(internet\_use_{ij}) + e_{ij}
+\end{aligned}$$ {#eq-model3}
+
+## Results
+
+Table 1 presents the results of the four multilevel models estimating youth cultural participation. Model 1 includes all predictors as main effects, Model 2 adds the interaction term between internet use and the year dummy, Model 3 extends Model 2 by allowing the slope of internet use to vary across country-years. The null model (Model 0) serves as baseline tocompute the Intraclass Correlation Coefficient (ICC).
+
+```{r}
+#| echo: false
+#| message: false
+#| warning: false
+#| label: regression table
+tab_model(model0, model1, model2,model3,
+          dv.labels = c("Null model", "Model 1", "Model 2", "Model 3"),
+          show.icc   = TRUE,
+          show.re.var = TRUE,
+          p.style    = "stars",
+          title = "Table 1. Multilevel Models of Youth Cultural Participation (2007-2013)"
+)
+```
+
+## Interpretation and substantive insights
+
+## Limitations and reflection
+
+## Bibliography
+
+## AI disclosure
