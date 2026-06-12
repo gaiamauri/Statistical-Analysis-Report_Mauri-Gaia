@@ -75,7 +75,7 @@ summary(df_final$gdp_pc_z)
 # NULL MODEL (intercept only, no predictors): To compute ICC before adding predictors
 
 model0 <- lmer(
-  part_index ~ 1 + (1 | country),
+  part_index ~ 1 + (1 | country_year),
   data = df_final,
 )
 
