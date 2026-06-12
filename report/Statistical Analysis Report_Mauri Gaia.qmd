@@ -1,28 +1,127 @@
 ---
-title: "Statistical Analysis Report"
+title: "Individual and country-level determinants of youth cultural participation in Europe: a Multilevel Analysis using Eurobarometer data (2007 and 2013)"
 author: "Gaia Mauri"
-format: pdf
+format: html
 editor: visual
 ---
 
-# Individual and country-level determinants of youth cultural participation in Europe: a Multilevel Analysis using Eurobarometer data (2007 and 2013)
+```{r}
+#| label: Load data
+#| echo: false
+#| message: false
+#| warning: false
 
-Cultural participation is a right enshrined in the United Nations Declaration of Human Rights, a key element for the quality of individual and collective life, able to generate positive effects on individual opportunities, quality of life and wellness as a whole.
+library(tidyverse)
+library(lme4) 
+library(sjPlot)
+library(marginaleffects)
 
-It should be explored in a multidimensional way, taking into account a broad spectrum of cultural activities and describing how both individual characteristics and social and contextual features affect it.
+#Load data
+df_final <- read_csv("../data/processed/main_dataset.csv",
+                     show_col_types = FALSE)
+# Prepare variables
+#Create year_country variable because gdp_pc and culture_exp change in the country between 2007 and 2013
 
-The European Union has played an increasing role in cultural policy and European cultural cooperation with the development of an Agenda for Culture by the European Commission in 2007, endorsed by the Council of the European Union and the European Council. 
+df_final <- df_final %>%
+  filter(!is.na(country), !is.na(year), !is.na(part_index)) %>%
+  mutate(
+    country_year = factor(str_c(country, "_", year)),
+    country = factor(country),
+ # education_cat as factor with "low" as reference category     
+    education_cat = factor(education_cat,
+                           levels = c("low", "medium", "high")),
+    country = factor(country),
+ year_2013 = as.numeric(year == 2013)
+ 
+)
+# Macro statistics: standardise the country variables using mean and sd at the country level
+macro_stats <- df_final %>%
+  group_by(country_year) %>%
+  summarise(
+    gdp_raw = mean(gdp_pc, na.rm = TRUE),
+    culture_raw = mean(culture_exp, na.rm = TRUE),
+    .groups = "drop"
+  ) %>%
+  filter(!is.na(gdp_raw), !is.na(culture_raw)) %>%
+  summarise(
+    mean_gdp  = mean(gdp_raw, na.rm = TRUE), 
+    sd_gdp    = sd(gdp_raw, na.rm = TRUE),
+    mean_cult = mean(culture_raw, na.rm = TRUE), 
+    sd_cult   = sd(culture_raw, na.rm = TRUE)
+  )
 
-For the purpose of this analysis data come from the Special Eurobarometer 278 “European cultural values”and the Special Eurobarometer 399 “Cultural Access and Participation”, two surveys conducted by the European Commission in 2007 and 2013 in which European citizens were interviewed face-to-face in their homes across all 27 EU countries plus Croatia. Each person answers questions about their cultural participation.
+    # Standardise continuous predictors (x - mean(x)) / sd(x) → mean = 0, sd = 1
+df_final <- df_final %>%
+  mutate(   
+  #For individual predictor we calculate the on all the dataset,
+  #for country-level predictors we use the means at macro level
+ internet_use_z = (internet_use_rev - mean(internet_use_rev, na.rm = TRUE)) /
+      sd(internet_use_rev, na.rm = TRUE),
+ age_z= (age - mean(age, na.rm = TRUE)) / sd(age, na.rm = TRUE),
+   gdp_pc_z= (gdp_pc - macro_stats$mean_gdp) / macro_stats$sd_gdp,
+ culture_exp_z= (culture_exp - macro_stats$mean_cult) / macro_stats$sd_cult
+  )
+# Load saved models
+model0 <- readRDS("../tables/model0.rds")
+model1 <- readRDS("../tables/model1.rds")
+model2 <- readRDS("../tables/model2.rds")
+model3 <- readRDS("../tables/model3.rds")
+```
 
-The research aims to understand to what extent do individual-level factors (internet use for cultural purposes, education, socioeconomic status) and country-level factors (GDP per capita, government expenditure on culture) explain participation in cultural activities among young Europeans (15–29 years old) and how did this relationship changed between 2007 and 2013.
+Cultural participation is a right enshrined in the United Nations Declaration of Human Rights, a key element for the quality of individual and collective life, able to generate positive effects on individual opportunities, quality of life and wellness as a whole. Its study should take into account a broad spectrum of cultural activities and analyse how both individual characteristics and social and contextual features affect it.
+
+## Research question and hypotheses
+
+The research aims to understand to what extent do individual-level factors (internet use for cultural purposes, education, socioeconomic status) and country-level factors (GDP per capita, government expenditure on culture) explain participation in cultural activities among young Europeans (15–29 years old) and how did this relationship change between 2007 and 2013.
 
 The main hypotheses are the following:
 
-1.  Individual internet use for cultural purposes is associated with physical cultural participation among young Europeans, net of educational attainment and employment status. The direction of the effect (positive = complement; negative = substitute) is determined empirically;
+1.  Individual internet use is associated with physical cultural participation among young Europeans, net of educational attainment and employment status. The direction of the effect (positive = complement; negative = substitute) is determined empirically;
 
 2.  The association between internet use and cultural participation changed between 2007 and 2013, when social media and digital platforms developed.
 
 3.  Young people living in countries with higher GDP per capita show higher cultural participation rates, independently of individual-level socioeconomic characteristics;
 
-4.  Young people living in countries with higher government expenditure on culture show higher participation rates independently of national wealth, suggesting that institutional investment matters over and above individual purchasing power.
+4.  Young people living in countries with higher government expenditure on culture show higher participation rates independently of national wealth.
+
+The central theoretical point focuses on digitalization and its relationship with cultural participation, is to understand whether digital culture replaces physical cultural attendance and/or complements it.
+
+## Data and variable operationalization
+
+Data come from two Special Eurobarometers: Eurobarometer 278 “European cultural values” and Eurobarometer 399 “Cultural Access and Participation”, two surveys conducted by the European Commission in 2007 and 2013 in which around 27.000 European citizens were interviewed face-to-face in their homes across all 27 EU countries. Each person answered questions about their cultural participation.
+
+These data were pooled into a single cross-sectional dataset of 9,131 young Europeans aged 15–29 across 27 countries. The unit of analysis is the individual, nested within country-years.
+
+The dependent variable is an index of cultural participation (0–7), counting the number of activities attended at least once in the last 12 months (cinema, theatre, concert, museum, monuments, library, ballet). The index follows an approximately symmetric, bell-shaped distribution (mean = 3.41, median = 3), with only 10% scoring zero, supporting the use of a linear multilevel model.
+
+```{r}
+#| echo: false
+#| label: fig-distribution
+#| fig-cap: "Distribution of the Cultural Participation Index"
+
+# Histogram of the Distribution of the Dependent Variable: participation index
+ggplot(df_final, aes(x = part_index)) +
+  geom_histogram(bins = 8, fill = "cyan3", color = "white") +
+  geom_vline(aes(xintercept = mean(part_index, na.rm = TRUE)),
+             color = "darkblue", linetype = "dashed", linewidth = 0.8) +
+  geom_vline(aes(xintercept = median(part_index, na.rm = TRUE)),
+             color = "gray28", linetype = "dotted", linewidth = 0.8) +
+  annotate("text", x = mean(df_final$part_index, na.rm = TRUE) + 0.2,
+           y = 1450, label = "Mean = 3.41", color = "darkblue", size = 3.5, hjust = 0) +
+  annotate("text", x = median(df_final$part_index, na.rm = TRUE) - 0.2,
+           y = 1350, label = "Median = 3", color = "gray28", size = 3.5, hjust = 1) +
+  theme_minimal() +
+  labs(title = "Distribution of the Cultural Participation Index",
+       x = "Number of activities (0-7)", y = "Count")
+
+```
+
+The main independent variable is internet use for cultural purposes. A key limitation is that this variable is operationalized differently across waves: in 2007 it measures general internet use frequency, while in 2013 it captures specifically cultural internet use, introducing partial non-comparability. Country-level predictors include GDP per capita PPS and government expenditure on culture (% GDP), both from Eurostat (2007 and 2013). Control variables include educational attainment (age when stopped full-time education, recoded into three categories: low/medium/high), employment status, sex, and a year dummy (2007/2013).
+
+All continuous predictors are standardised (z-scores), country-level variables are centred at their cross-country mean to improve interpretability of the intercept.
+
+## Model choice and statistical justification
+
+The nested structure of the data, individuals within country-years, requires a multilevel model, with random intercepts by country-year. The model allows baseline participation rates to vary across European contexts while estimating fixed effects for both individual- and country-level predictors.
+
+Given the distributional properties of the outcome described in the previous pharagraph, a linear multilevel model is preferred over a multilevel Poisson or negative binomial model.

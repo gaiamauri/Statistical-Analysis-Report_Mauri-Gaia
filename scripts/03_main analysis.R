@@ -66,10 +66,6 @@ df_final <- df_final %>%
   )
 
 
-df_final %>% 
-  select(part_index, internet_use_z, year_2013, education_cat, female, age_z, gdp_pc_z, culture_exp_z, country_year) %>% 
-  summarise(across(everything(), ~sum(is.na(.)))) %>% 
-  pivot_longer(everything(), names_to = "Variabile_nel_Modello", values_to = "Numero_di_NA_Totale")
 
 # check
 summary(df_final$internet_use_z)  # mean ≈ 0, sd ≈ 1
