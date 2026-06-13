@@ -1,7 +1,10 @@
 ---
 title: "Individual and country-level determinants of youth cultural participation in Europe: a Multilevel Analysis using Eurobarometer data (2007 and 2013)"
 author: "Gaia Mauri"
-format: html
+format:
+  html:
+    embed-resources: true
+bibliography: references.bib
 editor: visual
 ---
 
@@ -84,15 +87,15 @@ The main hypotheses are the following:
 
 4.  Young people living in countries with higher government expenditure on culture show higher participation rates independently of national wealth.
 
-The central theoretical point focuses on digitalization and its relationship with cultural participation, is to understand whether digital culture replaces physical cultural attendance and/or complements it.
+The central theoretical point focuses on digitalization and its relationship with cultural participation, to understand whether digital culture replaces physical cultural attendance and/or complements it.
 
 ## Data and variable operationalization
 
-Data come from two Special Eurobarometers: Eurobarometer 278 “European cultural values” and Eurobarometer 399 “Cultural Access and Participation”, two surveys conducted by the European Commission in 2007 and 2013 in which around 27.000 European citizens were interviewed face-to-face in their homes across all 27 EU countries. Each person answered questions about their cultural participation.
+Data come from two Special Eurobarometers: Eurobarometer 278 “European cultural values” and Eurobarometer 399 “Cultural Access and Participation”, two surveys conducted by the European Commission in 2007 and 2013 in which around 27.000 European citizens were interviewed face-to-face in their homes across all 27 EU countries. Each interviewed answered questions about its cultural participation.
 
-These data were pooled into a single cross-sectional dataset of 9,131 young Europeans aged 15–29 across 27 countries. The unit of analysis is the individual, nested within country-years.
+Data were pooled into a single cross-sectional dataset of 9,131 young Europeans aged 15–29 across 27 countries, so, the unit of analysis, is the individual, nested within country-years.
 
-The dependent variable is an index of cultural participation (0–7), counting the number of activities attended at least once in the last 12 months (cinema, theatre, concert, museum, monuments, library, ballet). The index follows an approximately symmetric, bell-shaped distribution (mean = 3.41, median = 3), with only 10% scoring zero, supporting the use of a linear multilevel model.
+The dependent variable is an index of cultural participation (0–7), counting the number of activities attended at least once in the last 12 months (cinema, theatre, concert, museum, monuments, library, ballet). As shown in Figure 1, the index follows an approximately symmetric, bell-shaped distribution (mean = 3.41, median = 3), with only 10% scoring zero, supporting the use of a linear multilevel model.
 
 ```{r}
 #| echo: false
@@ -124,7 +127,7 @@ All continuous predictors are standardised (z-scores), country-level variables a
 
 The nested structure of the data, individuals within country-years, requires a multilevel model, with random intercepts by country-year. The model allows baseline participation rates to vary across European contexts while estimating fixed effects for both individual- and country-level predictors.
 
-Given the distributional properties of the outcome described in the previous pharagraph, a linear multilevel model is preferred over a multilevel Poisson or negative binomial model.
+Given the distributional properties of the outcome described in the previous paragraph, a linear multilevel model is preferred over a multilevel Poisson or negative binomial model.
 
 Four models are estimated sequentially:
 
@@ -132,7 +135,7 @@ Four models are estimated sequentially:
 
 $$part\_index_{ij} = \beta_0 + u_j + e_{ij}$$ {#eq-model0}
 
-**Model 1** is the multilevel base model, it introduces all fixed-effect predictors — internet use, education, sex, age, year dummy, GDP per capita and government expenditure on culture — with a random intercept by country-year. This model tests Hypotheses 1, 3, and 4.
+**Model 1** is the multilevel base model, it introduces all fixed-effect predictors (internet use, education, sex, age, year dummy, GDP per capita and government expenditure on culture) with a random intercept by country-year. This model tests Hypotheses 1, 3, and 4.
 
 $$\begin{aligned}
 part\_index_{ij} = \, & \beta_0 + \beta_1(internet\_use_{ij}) + \beta_2(year_{ij}) + \\
@@ -161,7 +164,7 @@ part\_index_{ij} = \, & \beta_0 + \beta_1(internet\_use_{ij}) + \beta_2(year_{ij
 
 ## Results
 
-Table 1 presents the results of the four multilevel models estimating youth cultural participation. Model 1 includes all predictors as main effects, Model 2 adds the interaction term between internet use and the year dummy, Model 3 extends Model 2 by allowing the slope of internet use to vary across country-years. The null model (Model 0) serves as baseline tocompute the Intraclass Correlation Coefficient (ICC).
+Table 1 presents the results of the four multilevel models estimating youth cultural participation. Model 1 includes all predictors as main effects, Model 2 adds the interaction term between internet use and the year dummy, Model 3 extends Model 2 by allowing the slope of internet use to vary across country-years. The null model (Model 0) serves as baseline to compute the Intraclass Correlation Coefficient (ICC).
 
 ```{r}
 #| echo: false
@@ -177,10 +180,82 @@ tab_model(model0, model1, model2,model3,
 )
 ```
 
+The null model yields an ICC of 0.09, indicating that 9% of the total variance in cultural participation is explained by the differences between country-years, while the remaining 91% indicates that the individual part (internet use, education, employment) is the most important. Although it is slightly below the conventional threshold of 0.10, a multilevel model remains necessary because the research design includes country-level predictors (GDP per capita and government expenditure on culture) that cannot be correctly estimated in a single-level OLS model without incorrect standard errors. Furthermore, the random intercepts capture systematic baseline differences in cultural participation across European contexts that are meaningful.
+
+**Individual-level predictors.** Across both models, educational attainment is the strongest predictor of cultural participation. Compared to individuals with low education (reference category), those with medium education participate in approximately 0.82 more activities (Model 1: b = 0.82, CI: 0.63–1.00, p\<0.001), while those with high education participate in approximately 2.18 more activities (Model 1: b = 2.18, CI: 2.00–2.37, p\<0.001). Internet use is positively associated with participation in both models. In Model 1, a one standard deviation increase in internet use is associated with 0.33 additional cultural activities (CI: 0.29–0.37, p\<0.001). Being female is associated with approximately 0.35 more activities than males. Age, standardized within the 15–29 range, is negatively associated with participation (b = -0.10, p\<0.001), indicating that younger respondents within the range participate slightly more.
+
+**Country-level predictors.** GDP per capita is not significantly associated with participation in either model (Model 1: b = 0.08, p = 0.191; Model 2: b = 0.08, p = 0.164). Government expenditure on culture, however, is positively and significantly associated with participation (Model 1: b = 0.23, CI: 0.12–0.34, p\<0.001; Model 2: b = 0.22, CI: 0.10–0.33, p\<0.001), suggesting that institutional investment in cultural infrastructure is associated with higher youth participation, independently of national wealth.
+
+**Interaction term (Model 2).** The interaction between internet use and year (internet use \* year 2013) is negative and significant (b = -0.35, CI: -0.43 – -0.27, p\<0.001). In 2007, a one standard deviation increase in internet use is associated with 0.49 additional cultural activities. By 2013, this effect is reduced to approximately 0.14 (0.49 + (-0.35)), indicating that the association between internet use and physical cultural participation weakened over the period. The year 2013 main effect is negative but marginally non-significant in Model 2 (b = -0.22, p = 0.054).
+
+Figure 2 visualizes the interaction between internet use and wave, showing two lines with different slopes: the 2007 line is steeper, reflecting the stronger complementary effect of internet use in that period.
+
+```{r}
+#| echo: false
+#| label: fig-interaction
+#| fig-cap: "Predicted Cultural Participation by Internet Use and Wave"
+
+knitr::include_graphics("../figures/fig1_interaction_plot.png")
+```
+
+Figure 3 presents the Average Marginal Effects (AMEs) of internet use by wave. The AME in 2007 is 0.487 compared to 0.141 in 2013, a reduction of approximately 71%. The non-overlapping confidence intervals confirm that the difference between waves is statistically significant. 
+
+```{r}
+#| echo: false
+#| label: fig-ame
+#| fig-cap: "Marginal Effect of Internet Use on Cultural Participation"
+
+knitr::include_graphics("../figures/fig2_ame_plot.png")
+```
+
+**Random slopes (Model 3).** The variance of the random slopes for internet use is close to 0 (τ₁₁ = 0.02), suggesting that the association between internet use and cultural participation is relatively stable across European country-years. Fixed effect estimates are virtually unchanged from Model 2, confirming robustness. Figure 4 displays the country-year random effects from Model 3. While baseline participation rates vary substantially across European contexts (left panel), with Nordic and Western European countries which tend to have positive intercepts (higher baseline participation) and Eastern European countries which have negative intercepts (lower baseline), the slopes for internet use show less variation (right panel), with most country-year deviations clustering near zero. This confirms that the association between internet use and cultural participation is relatively homogeneous across European societies.
+
+```{r}
+#| echo: false
+#| label: fig-randomslopes
+#| fig-cap: "Random slopes for Internet use by country-year "
+
+knitr::include_graphics("../figures/fig4_random_slopes.png")
+
+```
+
+The variance of the random intercepts (τ₀₀) decreases substantially from 0.37 in the null model to 0.15 in Models 1–3, indicating that the individual- and country-level predictors explain a large share of the baseline differences in participation between country-years. The residual variance (σ²), the variability in the residuals that is not explained by the model, similarly decreases from 4.01 to 3.22 as predictors are added, reflecting improved model fit.
+
+Figure 5 disaggregates participation by activity type and wave. Cinema is the most common activity (75%) and shows the strongest decline between 2007 and 2013, along with the diffusion of streaming platforms. Activities less substitutable by digital alternatives, such as ballet and live concerts, show smaller declines, suggesting heterogeneous substitution effects across activity types.
+
+```{r}
+#| echo: false
+#| label: fig-activitiesdisaggregated
+#| fig-cap: "Participation Rate by Cultural Activity and Wave"
+
+knitr::include_graphics("../figures/fig5_activities_disaggregated.png")
+```
+
 ## Interpretation and substantive insights
+
+From the results the following insights and conclusions can be drawn:
+
+Internet use complements rather than substituting physical cultural participation, but less over time. In 2007, higher internet use was associated with attending more cultural activities in person, consistent with the hypothesis that the internet can complement rather than replace offline participation. By 2013, this effect weakened significantly, a reduction of approximately 71%. This change can be related to the mass diffusion of social media platforms and streaming apps between the two waves. However, this finding must be interpreted with caution: the internet use variable is operationalised differently across waves, as already mentioned. This difference in measure may contribute to the weakening of the effect, as the 2013 variable already involves culturally engaged users, reducing the association. The conclusion that internet use was more strongly complementary to physical cultural participation in 2007 than in 2013 is plausible, but the change is strongly related to the different variable operationalisation.
+
+The most powerful predictor in all models is educational attainment. Highly educated young Europeans participate in around two more cultural activities than their low-educated peers, net of all other factors (b = 2.18, p\<0.001). This finding is consistent with \[\@bocci2023\], who documented persistent educational gradients in cultural participation across Europe. Digitalisation has not interrupted the fundamental socioeconomic structure of cultural access among youth.
+
+Government expenditure on culture shows a positive association with participation across all models, while GDP per capita shows no significant effect. However, these country-level estimates should be interpreted with caution: with only 27 country-years at level 2, coefficients for country-level predictors are unstable and with wide uncertainty intervals, as reflected in the confidence intervals for GDP per capita, which cross zero in all models. Rather than drawing strong conclusions, these patterns suggest that institutional investment in cultural infrastructure may matter over and above national wealth, an hypothesis that should be better tested by further investigation with a larger sample. However, the non-significance of GDP per capita does not exclude an economic gradient in cultural participation.
 
 ## Limitations and reflection
 
+Several limitations should be taken into account when interpreting these findings.
+
+The main independent variable, internet use, is measured differently in the two waves, introducing partial non-comparability that affects the estimated change between waves. The observed weakening of the internet effect between 2007 and 2013 should therefore be interpreted cautiously because part of the change may reflect the measurement differences.
+
+Reverse causality: the cross-sectional design within each wave cannot establish causal direction. Individuals who are already culturally engaged may use the internet more for cultural purposes as a consequence of their participation rather than as a cause. Furthermore, internet use for cultural purposes may itself proxy latent cultural interest; someone searching for museum exhibitions online is already culturally disposed. This does not invalidate the analysis but changes its interpretation.
+
+Limited country-level units: with only 27 countries at level 2, country-level coefficient estimates are unstable and highly uncertain. GDP per capita and government cultural expenditure should not be interpreted as precise causal estimates. These patterns should be treated as hypotheses for future research with larger comparative samples.
+
+Aggregate participation index. The dependent variable combines seven culturally distinct activities. As shown in Figure 5, different activities show different trends between waves, cinema attendance declined most sharply, while ballet remained stable. Internet use may complement some activities while substituting others. Future research should model activity-specific outcomes to capture this heterogeneity.
+
 ## Bibliography
+
+::: {#refs}
+:::
 
 ## AI disclosure
