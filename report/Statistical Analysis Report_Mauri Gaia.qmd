@@ -4,7 +4,6 @@ author: "Gaia Mauri"
 format:
   html:
     embed-resources: true
-bibliography: references.bib
 editor: visual
 ---
 
@@ -237,7 +236,7 @@ From the results the following insights and conclusions can be drawn:
 
 Internet use complements rather than substituting physical cultural participation, but less over time. In 2007, higher internet use was associated with attending more cultural activities in person, consistent with the hypothesis that the internet can complement rather than replace offline participation. By 2013, this effect weakened significantly, a reduction of approximately 71%. This change can be related to the mass diffusion of social media platforms and streaming apps between the two waves. However, this finding must be interpreted with caution: the internet use variable is operationalised differently across waves, as already mentioned. This difference in measure may contribute to the weakening of the effect, as the 2013 variable already involves culturally engaged users, reducing the association. The conclusion that internet use was more strongly complementary to physical cultural participation in 2007 than in 2013 is plausible, but the change is strongly related to the different variable operationalisation.
 
-The most powerful predictor in all models is educational attainment. Highly educated young Europeans participate in around two more cultural activities than their low-educated peers, net of all other factors (b = 2.18, p\<0.001). This finding is consistent with \[\@bocci2023\], who documented persistent educational gradients in cultural participation across Europe. Digitalisation has not interrupted the fundamental socioeconomic structure of cultural access among youth.
+The most powerful predictor in all models is educational attainment. Highly educated young Europeans participate in around two more cultural activities than their low-educated peers, net of all other factors (b = 2.18, p\<0.001). This finding is consistent with Bocci and Mingo (2023), who documented persistent educational gradients in cultural participation across Europe. Digitalisation has not interrupted the fundamental socioeconomic structure of cultural access among youth.
 
 Government expenditure on culture shows a positive association with participation across all models, while GDP per capita shows no significant effect. However, these country-level estimates should be interpreted with caution: with only 27 country-years at level 2, coefficients for country-level predictors are unstable and with wide uncertainty intervals, as reflected in the confidence intervals for GDP per capita, which cross zero in all models. Rather than drawing strong conclusions, these patterns suggest that institutional investment in cultural infrastructure may matter over and above national wealth, an hypothesis that should be better tested by further investigation with a larger sample. However, the non-significance of GDP per capita does not exclude an economic gradient in cultural participation.
 
@@ -255,7 +254,18 @@ Aggregate participation index. The dependent variable combines seven culturally 
 
 ## Bibliography
 
-::: {#refs}
-:::
+Bocci, Laura, and Isabella Mingo. ‘*Cultural Participation and Social Inequality in the Digital Age: A Multilevel Cross-National Analysis in Europe*’. In *Models for Data Analysis*, vol. 402, edited by Eugenio Brentari, Marcello Chiodi, and Ernst-Jan Camiel Wit. Springer Proceedings in Mathematics & Statistics. Springer International Publishing, 2023.[ https://doi.org/10.1007/978-3-031-15885-8_6](https://doi.org/10.1007/978-3-031-15885-8_6).
+
+Cvetičanin, Predrag, Lucas Page Pereira, Mirko Petrić, Inga Tomić-Koludrović, Frédéric Lebaron, and Željka Zdravković. ‘*Cultural Practices and Socio-Digital Inequalities in Europe: Towards a Unified Research Framework in Cultural Participation Studies*’. *Cultural Sociology 19*, no. 3 (2025): 326–49.[ https://doi.org/10.1177/17499755231222520](https://doi.org/10.1177/17499755231222520).
+
+Janssen, Susanne,  Kristensen Nete Nørgaard, Verboord Marc, Marquart Franziska, Lamberti Giuseppe. ‘*Europeans’ Digital Cultural Participation: Diversification, Democratization, Barriers, and Affordances*’. *International Journal of Communication*, 18, (2024): 4031–4096. [link.gale.com/apps/doc/A812519102/AONE?u=milano&sid=bookmark-AONE&xid=125bf3a7](http://link.gale.com/apps/doc/A812519102/AONE?u=milano&sid=bookmark-AONE&xid=125bf3a7)
 
 ## AI disclosure
+
+This analysis was conducted with assistance from Claude (Anthropic), an AI language model, used throughout the research process.
+
+The datasets, research topic and hypotheses were autonomously chosen and then AI was used to brainstorm the research question and understand whether the chosen statistical models were appropriate.
+
+Claude provided assistance in understanding how the datasets were structured, writing and debugging R code for data import and data cleaning, especially with the Eurobarometer datasets since they were large and the variables operationalised and identified in different ways. To debug Claude was used by sending the errors that came up and it suggested where there was an error.
+
+Finally, AI was used to check the results and their interpretation. 
