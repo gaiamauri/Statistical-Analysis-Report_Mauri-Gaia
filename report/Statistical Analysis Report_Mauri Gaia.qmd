@@ -91,7 +91,7 @@ The central theoretical point focuses on digitalization and its relationship wit
 
 ## Data and variable operationalization
 
-Data come from two Special Eurobarometers: Eurobarometer 278 “European cultural values” and Eurobarometer 399 “Cultural Access and Participation”, two surveys conducted by the European Commission in 2007 and 2013 in which around 27.000 European citizens were interviewed face-to-face in their homes across all 27 EU countries. Each interviewed answered questions about its cultural participation.
+Data come from two Special Eurobarometers: Eurobarometer 278 “European cultural values” and Eurobarometer 399 “Cultural Access and Participation”, two surveys conducted by the European Commission in 2007 and 2013, in which around 27,000 European citizens were interviewed face-to-face in their homes across all 27 EU countries. Each interviewed answered questions about its cultural participation.
 
 Data were pooled into a single cross-sectional dataset of 9,131 young Europeans aged 15–29 across 27 countries, so, the unit of analysis, is the individual, nested within country-years.
 
@@ -119,7 +119,7 @@ ggplot(df_final, aes(x = part_index)) +
 
 ```
 
-The main independent variable is internet use for cultural purposes. A key limitation is that this variable is operationalized differently across waves: in 2007 it measures general internet use frequency, while in 2013 it captures specifically cultural internet use, introducing partial non-comparability. Country-level predictors include GDP per capita PPS and government expenditure on culture (% GDP), both from Eurostat (2007 and 2013). Control variables include educational attainment (age when stopped full-time education, recoded into three categories: low/medium/high), employment status, sex, and a year dummy (2007/2013).
+The main independent variable is internet use for cultural purposes. A key limitation is that this variable is operationalised differently across waves: in 2007 it measures general internet use frequency, while in 2013 it captures specifically cultural internet use, introducing partial non-comparability. Country-level predictors include GDP per capita PPS and government expenditure on culture (% GDP), both from Eurostat (2007 and 2013). Control variables include educational attainment (age when stopped full-time education, recoded into three categories: low/medium/high), employment status, sex, and a year dummy (2007/2013).
 
 All continuous predictors are standardised (z-scores), country-level variables are centred at their cross-country mean to improve interpretability of the intercept.
 
@@ -152,7 +152,7 @@ part\_index_{ij} = \, & \beta_0 + \beta_1(internet\_use_{ij}) + \beta_2(year_{ij
 & \gamma_1(GDP_j) + \gamma_2(Culture\_Exp_j) + u_j + e_{ij}
 \end{aligned}$$ {#eq-model2}
 
-**Model 3** further extends Model 2 by allowing the slope of internet use to vary across country-years (random slope specification), testing whether the internet effect is homogeneous across European societies.
+**Model 3** further extends Model 2 by allowing the slope of internet use to vary across country-years, testing whether the internet effect is homogeneous across European societies.
 
 $$\begin{aligned}
 part\_index_{ij} = \, & \beta_0 + \beta_1(internet\_use_{ij}) + \beta_2(year_{ij}) + \\
