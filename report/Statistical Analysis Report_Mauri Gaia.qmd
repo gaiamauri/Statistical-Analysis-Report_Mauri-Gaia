@@ -2,7 +2,8 @@
 title: "Individual and country-level determinants of youth cultural participation in Europe: a Multilevel Analysis using Eurobarometer data (2007 and 2013)"
 author: "Gaia Mauri"
 format:
-  html:
+  pdf:
+    geometry: margin=2.5cm
     embed-resources: true
 editor: visual
 ---
@@ -254,9 +255,9 @@ Aggregate participation index. The dependent variable combines seven culturally 
 
 ## Bibliography
 
-Bocci, Laura, and Isabella Mingo. ‘*Cultural Participation and Social Inequality in the Digital Age: A Multilevel Cross-National Analysis in Europe*’. In *Models for Data Analysis*, vol. 402, edited by Eugenio Brentari, Marcello Chiodi, and Ernst-Jan Camiel Wit. Springer Proceedings in Mathematics & Statistics. Springer International Publishing, 2023.[ https://doi.org/10.1007/978-3-031-15885-8_6](https://doi.org/10.1007/978-3-031-15885-8_6).
+Bocci, Laura, and Isabella Mingo. ‘*Cultural Participation and Social Inequality in the Digital Age: A Multilevel Cross-National Analysis in Europe*’. In *Models for Data Analysis*, vol. 402, edited by Eugenio Brentari, Marcello Chiodi, and Ernst-Jan Camiel Wit. Springer Proceedings in Mathematics & Statistics. Springer International Publishing, 2023.<https://doi.org/10.1007/978-3-031-15885-8_6>.
 
-Cvetičanin, Predrag, Lucas Page Pereira, Mirko Petrić, Inga Tomić-Koludrović, Frédéric Lebaron, and Željka Zdravković. ‘*Cultural Practices and Socio-Digital Inequalities in Europe: Towards a Unified Research Framework in Cultural Participation Studies*’. *Cultural Sociology 19*, no. 3 (2025): 326–49.[ https://doi.org/10.1177/17499755231222520](https://doi.org/10.1177/17499755231222520).
+Cvetičanin, Predrag, Lucas Page Pereira, Mirko Petrić, Inga Tomić-Koludrović, Frédéric Lebaron, and Željka Zdravković. ‘*Cultural Practices and Socio-Digital Inequalities in Europe: Towards a Unified Research Framework in Cultural Participation Studies*’. *Cultural Sociology 19*, no. 3 (2025): 326–49.<https://doi.org/10.1177/17499755231222520>.
 
 Janssen, Susanne,  Kristensen Nete Nørgaard, Verboord Marc, Marquart Franziska, Lamberti Giuseppe. ‘*Europeans’ Digital Cultural Participation: Diversification, Democratization, Barriers, and Affordances*’. *International Journal of Communication*, 18, (2024): 4031–4096. [link.gale.com/apps/doc/A812519102/AONE?u=milano&sid=bookmark-AONE&xid=125bf3a7](http://link.gale.com/apps/doc/A812519102/AONE?u=milano&sid=bookmark-AONE&xid=125bf3a7)
 
