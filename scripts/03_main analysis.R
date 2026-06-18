@@ -133,6 +133,17 @@ tab_model(model0, model1, model2,model3,
           title = "Multilevel Models of Youth Cultural Participation (2007-2013)",
           file       = "tables/regression_table.html")
 
+# Convert regression table HTML to PNG for PDF report
+install.packages("webshot2")
+library(webshot2)
+
+webshot2::webshot(
+  url      = "tables/regression_table.html",
+  file     = "tables/regression_table.png",
+  vwidth   = 1200,
+  vheight  = 800
+)
+
 # PREDICTION PLOT: Interaction internet_use × year_2013 ----
 # Following the approach shown in class (session 12)
 
